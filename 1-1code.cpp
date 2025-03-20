@@ -18,7 +18,7 @@ struct Play {
     std::string type;
 };
 
-std::string statement(const Invoice& invoice, const std::map<std::string, Play>& plays) {
+std::string statement(const Invoice& invoice, const std::map<std::, Play>& plays) {
     int totalAmount = 0;
     int volumeCredits = 0;
     std::string result = "Statement for " + invoice.customer + "\n";
