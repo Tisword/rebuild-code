@@ -1,5 +1,7 @@
 #include "statement.h"
 #include "view.h"
+#include "crow.h" // Crow 的头文件
+
 
 int main() {
     Plays plays = {
@@ -20,8 +22,14 @@ int main() {
     Statement statement;
     StatementResult result = statement.generate(invoice, plays);
 
-    // 调用 View 层展示数据
-    View::displayStatement(result);
+    // 启动 HTTP 服务器
+    crow::SimpleApp app;
+
+    CROW_ROUTE(app, "/")([&result]() {
+        return View::generateHtml(result);
+    });
+
+    app.port(8080).multithreaded().run();
 
     return 0;
 }
