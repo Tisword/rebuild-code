@@ -2,6 +2,7 @@
 #include "statement.h"
 #include <iomanip>
 #include <cmath>
+#include "performance_calculator_factory.h"
 
 StatementResult Statement::generate(const Invoice& invoice, const Plays& plays) {
     StatementResult result;
@@ -40,33 +41,14 @@ const Play& Statement::playFor(const Performance& perf, const Plays& plays) {
 
 int Statement::amountFor(const Performance& perf, const Plays& plays) {
     const auto& play = playFor(perf, plays);
-    int result = 0;
-
-    if (play.type == "tragedy") {
-        result = 40000;
-        if (perf.audience > 30) {
-            result += 1000 * (perf.audience - 30);
-        }
-    } else if (play.type == "comedy") {
-        result = 30000;
-        if (perf.audience > 20) {
-            result += 10000 + 500 * (perf.audience - 20);
-        }
-        result += 300 * perf.audience;
-    } else {
-        throw std::runtime_error("unknown type: " + play.type);
-    }
-
-    return result;
+    auto calculator = PerformanceCalculatorFactory::createCalculator(play);
+    return calculator->calculateAmount(perf);
 }
 
 int Statement::volumeCreditsFor(const Performance& perf, const Plays& plays) {
     const auto& play = playFor(perf, plays);
-    int credits = std::max(perf.audience - 30, 0);
-    if (play.type == "comedy") {
-        credits += std::floor(perf.audience / 5.0);
-    }
-    return credits;
+    auto calculator = PerformanceCalculatorFactory::createCalculator(play);
+    return calculator->calculateCredits(perf);
 }
 
 std::string Statement::usd(int amount) {
