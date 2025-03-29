@@ -1,5 +1,7 @@
+#pragma once
+
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <stdexcept>
 
@@ -22,4 +24,4 @@ struct Invoice {
 };
 
 // 类型别名简化代码
-using Plays = std::map<std::string, Play>;
+using Plays = std::unordered_map<std::string, Play>;

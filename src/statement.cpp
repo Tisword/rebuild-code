@@ -3,27 +3,32 @@
 #include <iomanip>
 #include <cmath>
 
-std::string Statement::generate(const Invoice& invoice, const Plays& plays) {
-    std::ostringstream result;
-    result << "Statement for " << invoice.customer << "\n";
+StatementResult Statement::generate(const Invoice& invoice, const Plays& plays) {
+    StatementResult result;
+    result.customer = invoice.customer;
+
+    int totalAmount = 0;
+    int totalCredits = 0;
 
     for (const auto& perf : invoice.performances) {
         const auto& play = playFor(perf, plays);
-        result << " " << play.name << ": " << usd(amountFor(perf, plays))
-               << " (" << perf.audience << " seats)\n";
+        int amount = amountFor(perf, plays);
+        int credits = volumeCreditsFor(perf, plays);
+
+        result.performances.push_back({
+            play.name,
+            perf.audience,
+            amount
+        });
+
+        totalAmount += amount;
+        totalCredits += credits;
     }
 
-    // 计算总金额和积分
-    int totalAmount = 0;
-    int totalCredits = 0;
-    for (const auto& perf : invoice.performances) {
-        totalAmount += amountFor(perf, plays);
-        totalCredits += volumeCreditsFor(perf, plays);
-    }
+    result.totalAmount = totalAmount;
+    result.totalCredits = totalCredits;
 
-    result << "Amount owed is " << usd(totalAmount) << "\n";
-    result << "You earned " << totalCredits << " credits\n";
-    return result.str();
+    return result;
 }
 
 // 实现辅助函数
@@ -70,4 +75,4 @@ std::string Statement::usd(int amount) {
     oss.imbue(std::locale("en_US.UTF-8"));
     oss << std::fixed << std::setprecision(2) << "$" << dollars;
     return oss.str();
-}   
+}

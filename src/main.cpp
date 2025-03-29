@@ -1,26 +1,27 @@
 #include "statement.h"
-#include <iostream>
+#include "view.h"
 
 int main() {
-    // 示例数据
     Plays plays = {
         {"hamlet", {"Hamlet", "tragedy"}},
-        {"as-like", {"As You Like It", "comedy"}}
+        {"as-like", {"As You Like It", "comedy"}},
+        {"othello", {"Othello", "tragedy"}}
     };
 
     Invoice invoice = {
         "BigCo",
         {
             {"hamlet", 55},
-            {"as-like", 35}
+            {"as-like", 35},
+            {"othello", 40}
         }
     };
 
-    try {
-        std::cout << Statement::generate(invoice, plays);
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
+    Statement statement;
+    StatementResult result = statement.generate(invoice, plays);
+
+    // 调用 View 层展示数据
+    View::displayStatement(result);
 
     return 0;
 }
